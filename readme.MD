@@ -1,0 +1,224 @@
+# Appsmartt Backend - Prueba Técnica
+
+Backend desarrollado con Node.js, Express, TypeORM y PostgreSQL para la gestión de operaciones financieras.
+
+## 🚀 Características
+
+- **Autenticación JWT** con middleware de seguridad
+- **Operaciones financieras** (compra/venta) con transacciones
+- **Validación robusta** de datos de entrada
+- **Arquitectura limpia** (Controller → Service → Repository)
+- **Base de datos PostgreSQL** con TypeORM
+- **Manejo de errores** centralizado
+- **Variables de entorno** para configuración
+- **TypeScript** para mayor seguridad de tipos
+
+## 📁 Estructura del Proyecto
+
+```
+backend/
+├── src/
+│   ├── config/          # Configuración (DB, JWT)
+│   ├── controllers/     # Controladores HTTP
+│   ├── entities/        # Entidades TypeORM
+│   ├── middlewares/     # Middlewares (Auth)
+│   ├── repositories/    # Capa de acceso a datos
+│   ├── routes/          # Definición de rutas
+│   ├── services/        # Lógica de negocio
+│   ├── types/           # Tipos TypeScript
+│   ├── utils/           # Utilidades (Error handler)
+│   └── app.ts           # Configuración Express
+├── .env.example         # Ejemplo variables de entorno
+├── package.json
+├── tsconfig.json
+└── server.ts            # Punto de entrada
+```
+
+## 🛠️ Instalación y Configuración
+
+### Prerrequisitos
+- Node.js (v18 o superior)
+- PostgreSQL (v12 o superior)
+- npm o yarn
+
+### Pasos de instalación
+
+1. **Clonar el repositorio**
+```bash
+git clone <url-del-repo>
+cd backend
+```
+
+2. **Instalar dependencias**
+```bash
+npm install
+```
+
+3. **Configurar variables de entorno**
+```bash
+cp .env.example .env
+```
+Editar `.env` con tus configuraciones:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_contraseña
+DB_DATABASE=appsmartt_db
+JWT_SECRET=tu_clave_secreta_muy_segura
+JWT_EXPIRES_IN=24h
+PORT=3000
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:3001
+```
+
+4. **Configurar base de datos**
+```bash
+# Crear la base de datos en PostgreSQL
+createdb appsmartt_db
+```
+
+5. **Ejecutar en desarrollo**
+```bash
+npm run dev
+```
+
+6. **Compilar para producción**
+```bash
+npm run build
+npm start
+```
+
+## 📚 API Endpoints
+
+### Autenticación
+
+#### POST /api/auth/login
+Iniciar sesión de usuario
+```json
+{
+  "email": "usuario@ejemplo.com",
+  "password": "password123"
+}
+```
+
+#### POST /api/auth/register
+Registrar nuevo usuario
+```json
+{
+  "email": "nuevo@ejemplo.com",
+  "password": "Password123",
+  "firstName": "Juan",
+  "lastName": "Pérez"
+}
+```
+
+#### GET /api/auth/validate
+Validar token JWT (requiere Authorization header)
+
+### Operaciones (Requieren Autenticación)
+
+#### POST /api/operations
+Crear nueva operación
+```json
+{
+  "type": "buy", // "buy" o "sell"
+  "amount": 1500.50,
+  "currency": "USD"
+}
+```
+
+#### GET /api/operations
+Obtener operaciones del usuario
+- Query params: `?page=1&limit=10`
+
+#### GET /api/operations/:id
+Obtener operación específica por ID
+
+## 🔒 Seguridad
+
+- **JWT Authentication**: Tokens seguros con expiración
+- **Validación de datos**: express-validator en todas las rutas
+- **Helmet**: Headers de seguridad HTTP
+- **CORS**: Configurado para origins específicos
+- **Transacciones**: Integridad de datos en PostgreSQL
+- **Hash de contraseñas**: bcryptjs con salt
+
+## 🏗️ Arquitectura
+
+### Patrón utilizado: Controller → Service → Repository
+
+1. **Controllers**: Manejan HTTP requests/responses y validaciones
+2. **Services**: Contienen lógica de negocio y coordinan repositorios
+3. **Repositories**: Acceso a datos y operaciones de base de datos
+4. **Middlewares**: Autenticación y validaciones transversales
+
+### Transacciones
+Las operaciones financieras utilizan transacciones de PostgreSQL para garantizar consistencia:
+```typescript
+const queryRunner = AppDataSource.createQueryRunner();
+await queryRunner.startTransaction();
+try {
+  // Operaciones...
+  await queryRunner.commitTransaction();
+} catch (error) {
+  await queryRunner.rollbackTransaction();
+  throw error;
+}
+```
+
+## 🧪 Testing
+
+```bash
+# Ejecutar tests (cuando se implementen)
+npm test
+```
+
+## 📦 Deployment
+
+### Con PM2 (Recomendado para producción)
+```bash
+npm install -g pm2
+npm run build
+pm2 start dist/server.js --name "appsmartt-backend"
+```
+
+### Variables de entorno de producción
+```env
+NODE_ENV=production
+JWT_SECRET=clave_super_segura_de_produccion
+DB_HOST=tu_servidor_postgres
+```
+
+## 🐛 Solución de Problemas
+
+### Error de conexión a PostgreSQL
+- Verificar que PostgreSQL esté corriendo
+- Validar credenciales en `.env`
+- Confirmar que la base de datos existe
+
+### Error "JWT_SECRET no definido"
+- Asegurar que `.env` tiene JWT_SECRET configurado
+- Reiniciar el servidor después de cambios en `.env`
+
+### Errores de TypeScript
+```bash
+npm run build
+```
+Revisar errores de tipos y corregir antes de ejecutar
+
+## 📝 Criterios de Aceptación Cumplidos
+
+✅ **Estructura del código**: Separación clara Controller → Service → Repository  
+✅ **Validación y seguridad**: Middleware JWT + validaciones express-validator  
+✅ **Transacciones TypeORM**: QueryRunner con rollback automático  
+✅ **Persistencia y consistencia**: Restricciones DB + validaciones  
+✅ **Respuesta de API**: Códigos HTTP apropiados + manejo de errores  
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crear branch para feature (`git checkout -b feature/nueva-caracteristica`)
+3. Commit cambios (`git commit -am 'Agregar nueva característica'`)
+4. Push al branch (`git push origin feature/nueva-caracteristica`)
+5. Crear Pull Request
