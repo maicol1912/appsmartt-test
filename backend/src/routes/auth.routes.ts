@@ -22,9 +22,7 @@ const registerValidation = [
         .withMessage('Email válido es requerido'),
     body('password')
         .isLength({ min: 6 })
-        .withMessage('La contraseña debe tener al menos 6 caracteres')
-        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-        .withMessage('La contraseña debe contener al menos una minúscula, una mayúscula y un número'),
+        .withMessage('La contraseña debe tener al menos 6 caracteres'),
     body('firstName')
         .trim()
         .isLength({ min: 2, max: 50 })
